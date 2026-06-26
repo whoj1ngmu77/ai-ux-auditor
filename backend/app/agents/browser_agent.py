@@ -20,14 +20,18 @@ async def run_browser_agent(url: str) -> dict:
         )
         page = await context.new_page()
         
-        await page.goto(url, wait_until="networkidle", timeout=30000)
-        await page.wait_for_timeout(2000)
+        try:
+            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        except Exception:
+            await page.goto(url, wait_until="commit", timeout=60000)
+        
+        await page.wait_for_timeout(3000)
         
         page_title = await page.title()
         page_html = await page.content()
         
         full_path = SCREENSHOTS_DIR / "full_page.png"
-        await page.screenshot(path=str(full_path), full_page=True)
+        await page.screenshot(path=str(full_path), full_page=True, timeout=30000)
         with open(full_path, "rb") as f:
             screenshots.append({
                 "name": "full_page",
@@ -35,7 +39,7 @@ async def run_browser_agent(url: str) -> dict:
             })
         
         viewport_path = SCREENSHOTS_DIR / "viewport.png"
-        await page.screenshot(path=str(viewport_path), full_page=False)
+        await page.screenshot(path=str(viewport_path), full_page=False, timeout=30000)
         with open(viewport_path, "rb") as f:
             screenshots.append({
                 "name": "viewport",
@@ -45,7 +49,7 @@ async def run_browser_agent(url: str) -> dict:
         await page.set_viewport_size({"width": 390, "height": 844})
         await page.wait_for_timeout(1000)
         mobile_path = SCREENSHOTS_DIR / "mobile.png"
-        await page.screenshot(path=str(mobile_path), full_page=True)
+        await page.screenshot(path=str(mobile_path), full_page=True, timeout=30000)
         with open(mobile_path, "rb") as f:
             screenshots.append({
                 "name": "mobile",

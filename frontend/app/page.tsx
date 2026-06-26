@@ -17,11 +17,15 @@ export default function Home() {
     try {
       let auditUrl = url;
       if (!auditUrl.startsWith("http")) auditUrl = "https://" + auditUrl;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/audit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: auditUrl }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (data.status === "success") {
         localStorage.setItem("auditReport", JSON.stringify(data.report));
@@ -29,8 +33,12 @@ export default function Home() {
       } else {
         setError("Audit failed. Please try another URL.");
       }
-    } catch {
-      setError("Something went wrong. Make sure the backend is running.");
+    } catch (e: any) {
+      if (e.name === "AbortError") {
+        setError("Request timed out. The site may be too heavy. Try again.");
+      } else {
+        setError("Something went wrong. Make sure the backend is running.");
+      }
     } finally {
       setLoading(false);
     }
@@ -95,6 +103,7 @@ export default function Home() {
               <p>👁️ Visual UX analyst reviewing screenshots...</p>
               <p>♿ Accessibility checker scanning HTML...</p>
               <p>📋 Report generator synthesizing findings...</p>
+              <p className="text-yellow-500/70 mt-2">⏳ Complex sites may take up to 2 minutes...</p>
             </div>
           </motion.div>
         )}
