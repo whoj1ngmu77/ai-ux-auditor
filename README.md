@@ -5,6 +5,7 @@ An autonomous multi-agent AI system that audits any website for UX and accessibi
 ## 🌐 Live Demo
 - **Frontend:** https://ai-ux-auditor-five.vercel.app
 - **Backend:** https://ai-ux-auditor-backend-lexb.onrender.com
+<img width="946" height="805" alt="Screenshot 2026-06-26 at 2 05 11 PM" src="https://github.com/user-attachments/assets/b533f289-09b3-48be-b212-6131c04c1e45" />
 
 ## 🎥 How It Works
 1. Paste any website URL
